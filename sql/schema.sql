@@ -1,3 +1,26 @@
+-- Drop tables in reverse order
+DROP TABLE IF EXISTS movies_releases;
+DROP TABLE IF EXISTS releases;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS countries;
+DROP TABLE IF EXISTS movies_studios;
+DROP TABLE IF EXISTS studios;
+DROP TABLE IF EXISTS movies_languages;
+DROP TABLE IF EXISTS languages;
+DROP TABLE IF EXISTS movies_genres;
+DROP TABLE IF EXISTS genres;
+DROP TABLE IF EXISTS crew_people;
+DROP TABLE IF EXISTS cast_people;
+DROP TABLE IF EXISTS people;
+DROP TABLE IF EXISTS movie_lists_tags;
+DROP TABLE IF EXISTS tags;
+DROP TABLE IF EXISTS movie_lists_movies;
+DROP TABLE IF EXISTS movie_lists;
+DROP TABLE IF EXISTS watch_comments;
+DROP TABLE IF EXISTS watches;
+DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS user_follows;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
