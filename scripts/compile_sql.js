@@ -15,10 +15,10 @@ function generateHeader(filename) {
 	const separator = "-".repeat(60);
 	const timestamp = new Date().toISOString();
 	return `-- ${separator}
-            -- MARK: ${filename}
-            -- ${separator}
+-- MARK: ${filename}
+-- ${separator}
 
-            `;
+`;
 }
 
 function compileSql() {
