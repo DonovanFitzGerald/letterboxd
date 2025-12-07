@@ -2,35 +2,33 @@ const { faker } = require("@faker-js/faker");
 const fs = require("fs");
 const path = require("path");
 
-const TEMPLATE_CONFIGS = {
-	cast: 191272,
-	crew: 146742,
-	genre: 19,
-	movie: 19760,
-	movie_genre: 49372,
-	person: 116860,
-};
-
 const CONFIG = {
-	users: 500,
-	userFollows: 1000,
-	languages: 100,
-	countries: 200,
-	studios: 250,
-	moviesLanguages: 2000,
-	moviesStudios: 2000,
-	events: 200,
-	releases: 1000,
-	moviesReleases: 1500,
-	tags: 300,
-	movieLists: 1000,
-	movieListsMovies: 3000,
-	movieListsTags: 1500,
-	watches: 5000,
-	watchComments: 2000,
+	users: 50,
+	userFollows: 100,
+	languages: 10,
+	countries: 20,
+	studios: 25,
+	moviesLanguages: 200,
+	moviesStudios: 200,
+	events: 20,
+	releases: 100,
+	moviesReleases: 150,
+	tags: 30,
+	movieLists: 100,
+	movieListsMovies: 300,
+	movieListsTags: 150,
+	watches: 500,
+	watchComments: 200,
 };
 
 const OUTPUT_FILE = path.join(__dirname, "..", "sql", "data.sql");
+const SAFE_MOVIE_IDS_PATH = path.join(__dirname, "safe_movie_ids.json");
+
+// Load safe movie IDs
+const MOVIE_IDS = JSON.parse(fs.readFileSync(SAFE_MOVIE_IDS_PATH, "utf8"));
+if (!Array.isArray(MOVIE_IDS) || MOVIE_IDS.length === 0) {
+	throw new Error("safe_movie_ids.json is empty or invalid");
+}
 
 // Reference data
 const LANGUAGES = [
@@ -134,14 +132,15 @@ const pastDate = (years = 3) => formatDateTime(faker.date.past({ years }));
 
 const pastDateOnly = (years = 3) => formatDate(faker.date.past({ years }));
 
+const formatValue = (val) => {
+	if (val === null) return "NULL";
+	if (typeof val === "number") return val;
+	return `'${escapeSQL(String(val))}'`;
+};
+
 function buildInsert(table, rows) {
 	if (rows.length === 0) return `-- No data for ${table}`;
 	const columns = Object.keys(rows[0]);
-	const formatValue = (val) => {
-		if (val === null) return "NULL";
-		if (typeof val === "number") return val;
-		return `'${escapeSQL(String(val))}'`;
-	};
 	const formattedRows = rows.map(
 		(row) => `(${columns.map((col) => formatValue(row[col])).join(", ")})`
 	);
@@ -150,6 +149,7 @@ function buildInsert(table, rows) {
 	)}) VALUES\n${formattedRows.join(",\n")};`;
 }
 
+// For relationships where both sides are 1..N integer IDs
 function generateUniquePairs(count, maxA, maxB, rowBuilder) {
 	const rows = [];
 	const seen = new Set();
@@ -161,6 +161,51 @@ function generateUniquePairs(count, maxA, maxB, rowBuilder) {
 		if (!seen.has(key)) {
 			seen.add(key);
 			rows.push(rowBuilder(a, b));
+			generated++;
+		}
+	}
+	return rows;
+}
+
+// For movie_X tables where movie_id must come from MOVIE_IDS array
+function generateUniqueMoviePairs(count, movieIds, maxOtherId, rowBuilder) {
+	const rows = [];
+	const seen = new Set();
+	let generated = 0;
+	const maxA = movieIds.length;
+
+	while (generated < count && generated < maxA * maxOtherId) {
+		const movieId = randomFrom(movieIds);
+		const otherId = randomInt(1, maxOtherId);
+		const key = `${movieId}-${otherId}`;
+		if (!seen.has(key)) {
+			seen.add(key);
+			rows.push(rowBuilder(movieId, otherId));
+			generated++;
+		}
+	}
+	return rows;
+}
+
+// For movie_lists_movies: (movie_list_id, movie_id)
+function generateUniqueMovieListMoviePairs(
+	count,
+	movieListCount,
+	movieIds,
+	rowBuilder
+) {
+	const rows = [];
+	const seen = new Set();
+	let generated = 0;
+	const maxMovies = movieIds.length;
+
+	while (generated < count && generated < movieListCount * maxMovies) {
+		const movieListId = randomInt(1, movieListCount);
+		const movieId = randomFrom(movieIds);
+		const key = `${movieListId}-${movieId}`;
+		if (!seen.has(key)) {
+			seen.add(key);
+			rows.push(rowBuilder(movieListId, movieId));
 			generated++;
 		}
 	}
@@ -240,17 +285,17 @@ const generateStudios = (count) =>
 		})
 	);
 
-const generateMoviesLanguages = (count, movieCount, languageCount) => {
+const generateMoviesLanguages = (count, movieIds, languageCount) => {
 	let idx = 0;
-	const rows = generateUniquePairs(
+	const rows = generateUniqueMoviePairs(
 		count,
-		movieCount,
+		movieIds,
 		languageCount,
-		(a, b) => {
+		(movieId, languageId) => {
 			idx++;
 			return {
-				movie_id: a,
-				language_id: b,
+				movie_id: movieId,
+				language_id: languageId,
 				is_primary: idx === 1 || Math.random() > 0.7 ? 1 : 0,
 				created_at: pastDate(3),
 			};
@@ -259,15 +304,19 @@ const generateMoviesLanguages = (count, movieCount, languageCount) => {
 	return buildInsert("movies_languages", rows);
 };
 
-const generateMoviesStudios = (count, movieCount, studioCount) =>
-	buildInsert(
-		"movies_studios",
-		generateUniquePairs(count, movieCount, studioCount, (a, b) => ({
-			movie_id: a,
-			studio_id: b,
+const generateMoviesStudios = (count, movieIds, studioCount) => {
+	const rows = generateUniqueMoviePairs(
+		count,
+		movieIds,
+		studioCount,
+		(movieId, studioId) => ({
+			movie_id: movieId,
+			studio_id: studioId,
 			created_at: pastDate(3),
-		}))
+		})
 	);
+	return buildInsert("movies_studios", rows);
+};
 
 const generateEvents = (count) =>
 	buildInsert(
@@ -302,15 +351,19 @@ const generateReleases = (count, eventCount, countryCount) =>
 		})
 	);
 
-const generateMoviesReleases = (count, movieCount, releaseCount) =>
-	buildInsert(
-		"movies_releases",
-		generateUniquePairs(count, movieCount, releaseCount, (a, b) => ({
-			movie_id: a,
-			release_id: b,
+const generateMoviesReleases = (count, movieIds, releaseCount) => {
+	const rows = generateUniqueMoviePairs(
+		count,
+		movieIds,
+		releaseCount,
+		(movieId, releaseId) => ({
+			movie_id: movieId,
+			release_id: releaseId,
 			created_at: pastDate(3),
-		}))
+		})
 	);
+	return buildInsert("movies_releases", rows);
+};
 
 const generateTags = (count) =>
 	buildInsert(
@@ -343,15 +396,19 @@ const generateMovieLists = (count, userCount) =>
 		})
 	);
 
-const generateMovieListsMovies = (count, movieListCount, movieCount) =>
-	buildInsert(
-		"movie_lists_movies",
-		generateUniquePairs(count, movieListCount, movieCount, (a, b) => ({
-			movie_list_id: a,
-			movie_id: b,
+const generateMovieListsMovies = (count, movieListCount, movieIds) => {
+	const rows = generateUniqueMovieListMoviePairs(
+		count,
+		movieListCount,
+		movieIds,
+		(movieListId, movieId) => ({
+			movie_list_id: movieListId,
+			movie_id: movieId,
 			created_at: pastDate(2),
-		}))
+		})
 	);
+	return buildInsert("movie_lists_movies", rows);
+};
 
 const generateMovieListsTags = (count, movieListCount, tagCount) => {
 	let idx = 0;
@@ -372,7 +429,7 @@ const generateMovieListsTags = (count, movieListCount, tagCount) => {
 	return buildInsert("movie_lists_tags", rows);
 };
 
-const generateWatches = (count, movieCount, userCount) =>
+const generateWatches = (count, movieIds, userCount) =>
 	buildInsert(
 		"watches",
 		Array.from({ length: count }, () => {
@@ -382,7 +439,7 @@ const generateWatches = (count, movieCount, userCount) =>
 				is_private: Math.random() > 0.9 ? 1 : 0,
 				rating: randomInt(1, 10),
 				review_text: faker.lorem.sentences(2),
-				movie_id: randomInt(1, movieCount),
+				movie_id: randomFrom(movieIds),
 				user_id: randomInt(1, userCount),
 				created_at: ts,
 				updated_at: ts,
@@ -409,9 +466,9 @@ const generateWatchComments = (count, userCount, watchCount) =>
 // Main execution
 function seed() {
 	console.log("Generating seed data...");
+	console.log(`Using ${MOVIE_IDS.length} safe movie IDs from JSON`);
 
 	const c = CONFIG;
-	const t = TEMPLATE_CONFIGS;
 	const actualLanguages = Math.min(c.languages, LANGUAGES.length);
 	const actualCountries = Math.min(c.countries, COUNTRIES.length);
 	const actualTags = Math.min(c.tags, TAG_NAMES.length);
@@ -429,13 +486,13 @@ function seed() {
 			name: "Movies-Languages",
 			sql: generateMoviesLanguages(
 				c.moviesLanguages,
-				t.movie,
+				MOVIE_IDS,
 				actualLanguages
 			),
 		},
 		{
 			name: "Movies-Studios",
-			sql: generateMoviesStudios(c.moviesStudios, t.movie, c.studios),
+			sql: generateMoviesStudios(c.moviesStudios, MOVIE_IDS, c.studios),
 		},
 		{ name: "Events", sql: generateEvents(c.events) },
 		{
@@ -444,7 +501,11 @@ function seed() {
 		},
 		{
 			name: "Movies-Releases",
-			sql: generateMoviesReleases(c.moviesReleases, t.movie, c.releases),
+			sql: generateMoviesReleases(
+				c.moviesReleases,
+				MOVIE_IDS,
+				c.releases
+			),
 		},
 		{ name: "Tags", sql: generateTags(c.tags) },
 		{ name: "Movie Lists", sql: generateMovieLists(c.movieLists, c.users) },
@@ -453,7 +514,7 @@ function seed() {
 			sql: generateMovieListsMovies(
 				c.movieListsMovies,
 				c.movieLists,
-				t.movie
+				MOVIE_IDS
 			),
 		},
 		{
@@ -464,7 +525,10 @@ function seed() {
 				actualTags
 			),
 		},
-		{ name: "Watches", sql: generateWatches(c.watches, t.movie, c.users) },
+		{
+			name: "Watches",
+			sql: generateWatches(c.watches, MOVIE_IDS, c.users),
+		},
 		{
 			name: "Watch Comments",
 			sql: generateWatchComments(c.watchComments, c.users, c.watches),
@@ -475,6 +539,8 @@ function seed() {
 		"-- Seed Data for Letterboxd Database",
 		"-- Generated: " + new Date().toISOString(),
 		"",
+		"START TRANSACTION;",
+		"",
 	];
 
 	for (const section of sections) {
@@ -483,6 +549,8 @@ function seed() {
 		output.push("");
 		console.log(`Generated: ${section.name}`);
 	}
+
+	output.push("COMMIT;");
 
 	fs.writeFileSync(OUTPUT_FILE, output.join("\n"), "utf-8");
 	console.log(`\nSeed data written to: ${OUTPUT_FILE}`);
