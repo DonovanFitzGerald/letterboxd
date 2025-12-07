@@ -44,16 +44,6 @@ CREATE TABLE user_follows (
 );
 
 
-CREATE TABLE movies (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(50) NOT NULL,
-  release_date DATE NOT NULL,
-  bio TEXT NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL
-);
-
-
 CREATE TABLE watches (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   liked TINYINT NOT NULL,
@@ -64,7 +54,7 @@ CREATE TABLE watches (
   user_id BIGINT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
-  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+  FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -99,7 +89,7 @@ CREATE TABLE movie_lists_movies (
   movie_id BIGINT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL,
   FOREIGN KEY (movie_list_id) REFERENCES movie_lists(id) ON DELETE CASCADE,
-  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+  FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE CASCADE,
   UNIQUE (movie_list_id, movie_id)
 );
 
@@ -131,48 +121,6 @@ CREATE TABLE people (
   updated_at DATETIME NOT NULL
 );
 
-CREATE TABLE cast_people (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  feature_priority INT(10) UNIQUE NOT NULL,
-  role CHAR(50) NOT NULL,
-  people_id BIGINT UNSIGNED NOT NULL,
-  movie_id BIGINT UNSIGNED NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL,
-  FOREIGN KEY (people_id) REFERENCES people(id) ON DELETE CASCADE,
-  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
-);
-
-CREATE TABLE crew_people (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  role CHAR(50) NOT NULL,
-  people_id BIGINT UNSIGNED NOT NULL,
-  movie_id BIGINT UNSIGNED NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL,
-  FOREIGN KEY (people_id) REFERENCES people(id) ON DELETE CASCADE,
-  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE genres (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name CHAR(50) NOT NULL,
-  bio TEXT NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL
-);
-
-CREATE TABLE movies_genres (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  movie_id BIGINT UNSIGNED NOT NULL,
-  genre_id BIGINT UNSIGNED NOT NULL,
-  created_at DATETIME NOT NULL,
-  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
-  FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE,
-  UNIQUE (movie_id, genre_id)
-);
-
 
 CREATE TABLE languages (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -187,7 +135,7 @@ CREATE TABLE movies_languages (
   movie_id BIGINT UNSIGNED NOT NULL,
   language_id BIGINT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL,
-  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+  FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE CASCADE,
   FOREIGN KEY (language_id) REFERENCES languages(id) ON DELETE CASCADE,
   UNIQUE (movie_id, language_id)
 );
@@ -206,7 +154,7 @@ CREATE TABLE movies_studios (
   movie_id BIGINT UNSIGNED NOT NULL,
   studio_id BIGINT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL,
-  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+  FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE CASCADE,
   FOREIGN KEY (studio_id) REFERENCES studios(id) ON DELETE CASCADE,
   UNIQUE (movie_id, studio_id)
 );
@@ -244,7 +192,7 @@ CREATE TABLE movies_releases (
   movie_id BIGINT UNSIGNED NOT NULL,
   release_id BIGINT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL,
-  FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+  FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE CASCADE,
   FOREIGN KEY (release_id) REFERENCES releases(id) ON DELETE CASCADE,
   UNIQUE (movie_id, release_id)
 );
