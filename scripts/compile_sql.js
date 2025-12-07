@@ -5,7 +5,7 @@ const SQL_FILES = [
 	"schema.sql",
 	"data.sql",
 	"optimizations.sql",
-	"prepared_statements.sql",
+	"stored_procedures.sql",
 ];
 
 const SQL_DIR = path.join(__dirname, "..", "sql");
