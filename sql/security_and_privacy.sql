@@ -8,7 +8,7 @@ CREATE ROLE 'role_content_manager';
 CREATE ROLE 'role_admin';
 
 -- ---------------------------------------------------------
--- Data Analyst - read-only access to all data
+-- Data Analyst - read-only permission
 -- ---------------------------------------------------------
 GRANT SELECT ON letterboxd.* TO 'role_data_analyst';
 
@@ -16,7 +16,7 @@ GRANT SELECT ON letterboxd.* TO 'role_data_analyst';
 -- Content Manager - modify film metadata, cast info, and handle content
 -- ---------------------------------------------------------
 
--- Film metadata
+-- Film metadata permissions
 GRANT SELECT, INSERT, UPDATE, DELETE
     ON letterboxd.movie          TO 'role_content_manager';
 GRANT SELECT, INSERT, UPDATE, DELETE
@@ -65,7 +65,7 @@ GRANT SELECT ON letterboxd.users   TO 'role_content_manager';
 GRANT SELECT ON letterboxd.watches TO 'role_content_manager';
 
 -- ---------------------------------------------------------
--- Admin - full access
+-- Admin - full access permission
 -- ---------------------------------------------------------
 GRANT ALL PRIVILEGES ON letterboxd.* TO 'role_admin' WITH GRANT OPTION;
 
