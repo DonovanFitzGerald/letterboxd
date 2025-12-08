@@ -85,11 +85,11 @@ BEGIN
         p_movie_id, p_user_id, NOW(), NOW()
     );
 
-  DELETE FROM movie_lists_movie
-  WHERE movie_id = p_movie_id
+    DELETE FROM movie_lists_movie
+    WHERE movie_id = p_movie_id
     AND movie_list_id IN (
-      SELECT id FROM movie_lists
-      WHERE user_id = p_user_id AND is_watch_list = 1
+        SELECT id FROM movie_lists
+        WHERE user_id = p_user_id AND is_watch_list = 1
     );
 
     COMMIT;
@@ -104,7 +104,7 @@ CREATE PROCEDURE sp_search_movies (
 )
 BEGIN
     SELECT id, name, release_date, bio
-    FROM movies
+    FROM movie
     WHERE LOWER(name) LIKE CONCAT('%', LOWER(p_query), '%');
 END $$
 
@@ -132,30 +132,6 @@ BEGIN
     VALUES (p_user_id, p_follow_user_id, NOW());
 END $$
 
-
--- get activity feed from followed users
-CREATE PROCEDURE sp_get_following_activity (
-    IN p_user_id BIGINT
-)
-BEGIN
-    SELECT 
-        w.id AS watch_id,
-        u.id AS user_id,
-        u.name AS user_name,
-        m.id AS movie_id,
-        m.name AS movie_name,
-        w.rating,
-        w.liked,
-        w.review_text,
-        w.created_at
-    FROM watches w
-    JOIN user_follows uf ON uf.follow_user_id = w.user_id
-    JOIN users u ON u.id = w.user_id
-    JOIN movies m ON m.id = w.movie_id
-    WHERE uf.user_id = p_user_id
-    ORDER BY w.created_at DESC
-    LIMIT 20;
-END $$
 
 
 
@@ -205,20 +181,6 @@ END$$
 
 DELIMITER ;
 
--- delete a user 
-
-DELIMITER $$
-
-CREATE PROCEDURE delete_user (
-  IN p_user_id BIGINT
-)
-BEGIN
-    SELECT AVG(rating) AS average_rating
-    FROM watches
-    WHERE movie_id = p_movie_id
-      AND rating IS NOT NULL;
-END $$
-
 
 -- get movie summary statistics
 CREATE PROCEDURE sp_get_movie_stats (
@@ -227,15 +189,15 @@ CREATE PROCEDURE sp_get_movie_stats (
 BEGIN
     SELECT
         m.id,
-        m.name,
+        m.title,
         COUNT(w.id) AS total_watches,
         SUM(CASE WHEN w.liked = 1 THEN 1 ELSE 0 END) AS total_likes,
         COUNT(DISTINCT mlm.movie_list_id) AS list_count
-    FROM movies m
+    FROM movie m
     LEFT JOIN watches w ON w.movie_id = m.id
-    LEFT JOIN movie_lists_movies mlm ON mlm.movie_id = m.id
+    LEFT JOIN movie_lists_movie mlm ON mlm.movie_id = m.id
     WHERE m.id = p_movie_id
-    GROUP BY m.id, m.name;
+    GROUP BY m.id, m.title;
 END $$
 
 DELIMITER ;
