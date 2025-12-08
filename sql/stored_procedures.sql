@@ -1,3 +1,12 @@
+-- Drop any procedures if they exist
+DROP PROCEDURE IF EXISTS create_user;
+DROP PROCEDURE IF EXISTS log_watch;
+DROP PROCEDURE IF EXISTS follow_user;
+DROP PROCEDURE IF EXISTS create_movie_list;
+DROP PROCEDURE IF EXISTS add_movie_to_list;
+DROP PROCEDURE IF EXISTS search_movie;
+DROP PROCEDURE IF EXISTS delete_user;
+
 -- create an account
 DELIMITER $$
 
@@ -31,7 +40,7 @@ BEGIN
   INSERT INTO watches (user_id, movie_id, rating, liked, review_text, is_private, created_at, updated_at)
   VALUES (p_user_id, p_movie_id, p_rating, p_liked, p_review, p_is_private, NOW(), NOW());
 
-  DELETE FROM movie_lists_movies
+  DELETE FROM movie_lists_movie
   WHERE movie_id = p_movie_id
     AND movie_list_id IN (
       SELECT id FROM movie_lists
@@ -84,7 +93,7 @@ CREATE PROCEDURE add_movie_to_list (
   IN p_movie_id BIGINT
 )
 BEGIN
-  INSERT IGNORE INTO movie_lists_movies
+  INSERT IGNORE INTO movie_lists_movie
   (movie_list_id, movie_id, created_at)
   VALUES (p_list_id, p_movie_id, NOW());
 END$$
@@ -95,12 +104,12 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE search_movies (
+CREATE PROCEDURE search_movie (
   IN p_query VARCHAR(50)
 )
 BEGIN
   SELECT id, name, release_date
-  FROM movies
+  FROM movie
   WHERE name LIKE CONCAT('%', p_query, '%');
 END$$
 

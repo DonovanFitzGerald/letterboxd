@@ -222,7 +222,7 @@ INSERT INTO studios (id, name, bio, created_at, updated_at) VALUES
 (25, 'Wyman LLC', 'Diverse optimal solution', '2021-09-27 21:30:36', '2021-09-27 21:30:36');
 
 -- Movies-Languages
-INSERT INTO movies_languages (movie_id, language_id, is_primary, created_at) VALUES
+INSERT INTO movie_languages (movie_id, language_id, is_primary, created_at) VALUES
 (33613, 4, 1, '2024-09-18 12:58:59'),
 (14560, 10, 1, '2024-04-17 01:09:25'),
 (10946, 6, 0, '2024-01-22 18:40:57'),
@@ -425,7 +425,7 @@ INSERT INTO movies_languages (movie_id, language_id, is_primary, created_at) VAL
 (46221, 1, 0, '2023-07-24 13:12:07');
 
 -- Movies-Studios
-INSERT INTO movies_studios (movie_id, studio_id, created_at) VALUES
+INSERT INTO movie_studios (movie_id, studio_id, created_at) VALUES
 (345637, 10, '2023-11-01 12:35:04'),
 (1029330, 17, '2024-12-06 07:00:33'),
 (9535, 12, '2023-12-13 09:15:01'),
@@ -754,7 +754,7 @@ INSERT INTO releases (id, name, date, release_type, event_id, country_id, create
 (100, 'Ain''t Misbehavin'' Release', '2022-11-25', 'digital', 10, 19, '2023-08-15 00:33:05', '2023-08-15 00:33:05');
 
 -- Movies-Releases
-INSERT INTO movies_releases (movie_id, release_id, created_at) VALUES
+INSERT INTO movie_releases (movie_id, release_id, created_at) VALUES
 (8940, 69, '2025-08-30 20:47:05'),
 (1192209, 18, '2024-07-03 08:09:08'),
 (10260, 44, '2025-08-18 17:05:52'),
@@ -1043,7 +1043,7 @@ INSERT INTO movie_lists (id, name, is_watch_list, is_private, user_id, created_a
 (100, 'cernuus cumque accusator', 0, 1, 32, '2025-10-28 16:41:10', '2025-10-28 16:41:10');
 
 -- Movie Lists-Movies
-INSERT INTO movie_lists_movies (movie_list_id, movie_id, created_at) VALUES
+INSERT INTO movie_lists_movie (movie_list_id, movie_id, created_at) VALUES
 (8, 11174, '2025-12-02 12:09:31'),
 (11, 8744, '2024-09-14 06:09:04'),
 (13, 20497, '2024-06-25 19:26:42'),

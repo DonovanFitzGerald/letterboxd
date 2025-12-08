@@ -1,26 +1,29 @@
 -- Drop tables in reverse order
-DROP TABLE IF EXISTS movies_releases;
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS movie_releases;
 DROP TABLE IF EXISTS releases;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS countries;
-DROP TABLE IF EXISTS movies_studios;
+DROP TABLE IF EXISTS movie_studios;
 DROP TABLE IF EXISTS studios;
-DROP TABLE IF EXISTS movies_languages;
+DROP TABLE IF EXISTS movie_languages;
 DROP TABLE IF EXISTS languages;
-DROP TABLE IF EXISTS movies_genres;
-DROP TABLE IF EXISTS genres;
-DROP TABLE IF EXISTS crew_people;
-DROP TABLE IF EXISTS cast_people;
-DROP TABLE IF EXISTS people;
 DROP TABLE IF EXISTS movie_lists_tags;
 DROP TABLE IF EXISTS tags;
-DROP TABLE IF EXISTS movie_lists_movies;
+DROP TABLE IF EXISTS movie_lists_movie;
 DROP TABLE IF EXISTS movie_lists;
 DROP TABLE IF EXISTS watch_comments;
 DROP TABLE IF EXISTS watches;
-DROP TABLE IF EXISTS movies;
 DROP TABLE IF EXISTS user_follows;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS users;        
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ---------------------------------------------------------
+-- MARK: Create all tables
+-- ---------------------------------------------------------
+
 
 CREATE TABLE users (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -83,7 +86,7 @@ CREATE TABLE movie_lists (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE movie_lists_movies (
+CREATE TABLE movie_lists_movie (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   movie_list_id BIGINT UNSIGNED NOT NULL,
   movie_id BIGINT UNSIGNED NOT NULL,
@@ -129,7 +132,7 @@ CREATE TABLE languages (
   updated_at DATETIME NOT NULL
 );
 
-CREATE TABLE movies_languages (
+CREATE TABLE movie_languages (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   is_primary TINYINT NOT NULL,
   movie_id BIGINT UNSIGNED NOT NULL,
@@ -149,7 +152,7 @@ CREATE TABLE studios (
   updated_at DATETIME NOT NULL
 );
 
-CREATE TABLE movies_studios (
+CREATE TABLE movie_studios (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   movie_id BIGINT UNSIGNED NOT NULL,
   studio_id BIGINT UNSIGNED NOT NULL,
@@ -187,7 +190,7 @@ CREATE TABLE releases (
   FOREIGN KEY (country_id) REFERENCES countries(id)
 );
 
-CREATE TABLE movies_releases (
+CREATE TABLE movie_releases (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   movie_id BIGINT UNSIGNED NOT NULL,
   release_id BIGINT UNSIGNED NOT NULL,

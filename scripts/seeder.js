@@ -8,14 +8,14 @@ const CONFIG = {
 	languages: 10,
 	countries: 20,
 	studios: 25,
-	moviesLanguages: 200,
-	moviesStudios: 200,
+	movieLanguages: 200,
+	movieStudios: 200,
 	events: 20,
 	releases: 100,
-	moviesReleases: 150,
+	movieReleases: 150,
 	tags: 30,
 	movieLists: 100,
-	movieListsMovies: 300,
+	movieListsmovie: 300,
 	movieListsTags: 150,
 	watches: 500,
 	watchComments: 200,
@@ -187,7 +187,7 @@ function generateUniqueMoviePairs(count, movieIds, maxOtherId, rowBuilder) {
 	return rows;
 }
 
-// For movie_lists_movies: (movie_list_id, movie_id)
+// For movie_lists_movie: (movie_list_id, movie_id)
 function generateUniqueMovieListMoviePairs(
 	count,
 	movieListCount,
@@ -197,9 +197,9 @@ function generateUniqueMovieListMoviePairs(
 	const rows = [];
 	const seen = new Set();
 	let generated = 0;
-	const maxMovies = movieIds.length;
+	const maxmovie = movieIds.length;
 
-	while (generated < count && generated < movieListCount * maxMovies) {
+	while (generated < count && generated < movieListCount * maxmovie) {
 		const movieListId = randomInt(1, movieListCount);
 		const movieId = randomFrom(movieIds);
 		const key = `${movieListId}-${movieId}`;
@@ -285,7 +285,7 @@ const generateStudios = (count) =>
 		})
 	);
 
-const generateMoviesLanguages = (count, movieIds, languageCount) => {
+const generatemovieLanguages = (count, movieIds, languageCount) => {
 	let idx = 0;
 	const rows = generateUniqueMoviePairs(
 		count,
@@ -301,10 +301,10 @@ const generateMoviesLanguages = (count, movieIds, languageCount) => {
 			};
 		}
 	);
-	return buildInsert("movies_languages", rows);
+	return buildInsert("movie_languages", rows);
 };
 
-const generateMoviesStudios = (count, movieIds, studioCount) => {
+const generatemovieStudios = (count, movieIds, studioCount) => {
 	const rows = generateUniqueMoviePairs(
 		count,
 		movieIds,
@@ -315,7 +315,7 @@ const generateMoviesStudios = (count, movieIds, studioCount) => {
 			created_at: pastDate(3),
 		})
 	);
-	return buildInsert("movies_studios", rows);
+	return buildInsert("movie_studios", rows);
 };
 
 const generateEvents = (count) =>
@@ -351,7 +351,7 @@ const generateReleases = (count, eventCount, countryCount) =>
 		})
 	);
 
-const generateMoviesReleases = (count, movieIds, releaseCount) => {
+const generatemovieReleases = (count, movieIds, releaseCount) => {
 	const rows = generateUniqueMoviePairs(
 		count,
 		movieIds,
@@ -362,7 +362,7 @@ const generateMoviesReleases = (count, movieIds, releaseCount) => {
 			created_at: pastDate(3),
 		})
 	);
-	return buildInsert("movies_releases", rows);
+	return buildInsert("movie_releases", rows);
 };
 
 const generateTags = (count) =>
@@ -396,7 +396,7 @@ const generateMovieLists = (count, userCount) =>
 		})
 	);
 
-const generateMovieListsMovies = (count, movieListCount, movieIds) => {
+const generateMovieListsmovie = (count, movieListCount, movieIds) => {
 	const rows = generateUniqueMovieListMoviePairs(
 		count,
 		movieListCount,
@@ -407,7 +407,7 @@ const generateMovieListsMovies = (count, movieListCount, movieIds) => {
 			created_at: pastDate(2),
 		})
 	);
-	return buildInsert("movie_lists_movies", rows);
+	return buildInsert("movie_lists_movie", rows);
 };
 
 const generateMovieListsTags = (count, movieListCount, tagCount) => {
@@ -483,16 +483,16 @@ function seed() {
 		{ name: "Countries", sql: generateCountries(c.countries) },
 		{ name: "Studios", sql: generateStudios(c.studios) },
 		{
-			name: "Movies-Languages",
-			sql: generateMoviesLanguages(
-				c.moviesLanguages,
+			name: "movie-Languages",
+			sql: generatemovieLanguages(
+				c.movieLanguages,
 				MOVIE_IDS,
 				actualLanguages
 			),
 		},
 		{
-			name: "Movies-Studios",
-			sql: generateMoviesStudios(c.moviesStudios, MOVIE_IDS, c.studios),
+			name: "movie-Studios",
+			sql: generatemovieStudios(c.movieStudios, MOVIE_IDS, c.studios),
 		},
 		{ name: "Events", sql: generateEvents(c.events) },
 		{
@@ -500,19 +500,15 @@ function seed() {
 			sql: generateReleases(c.releases, c.events, actualCountries),
 		},
 		{
-			name: "Movies-Releases",
-			sql: generateMoviesReleases(
-				c.moviesReleases,
-				MOVIE_IDS,
-				c.releases
-			),
+			name: "movie-Releases",
+			sql: generatemovieReleases(c.movieReleases, MOVIE_IDS, c.releases),
 		},
 		{ name: "Tags", sql: generateTags(c.tags) },
 		{ name: "Movie Lists", sql: generateMovieLists(c.movieLists, c.users) },
 		{
-			name: "Movie Lists-Movies",
-			sql: generateMovieListsMovies(
-				c.movieListsMovies,
+			name: "Movie Lists-movie",
+			sql: generateMovieListsmovie(
+				c.movieListsmovie,
 				c.movieLists,
 				MOVIE_IDS
 			),

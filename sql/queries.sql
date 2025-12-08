@@ -39,7 +39,7 @@ VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW());
 -- remove from watchlist automatically after logging
 
 DELETE mlm
-FROM movie_lists_movies mlm
+FROM movie_lists_movie mlm
 JOIN movie_lists ml ON ml.id = mlm.movie_list_id
 WHERE ml.user_id = ?
   AND ml.is_watch_list = 1
@@ -48,7 +48,7 @@ WHERE ml.user_id = ?
 -- search movies by name
 
 SELECT id, name, release_date, bio
-FROM movies
+FROM movie
 WHERE LOWER(name) LIKE CONCAT('%', LOWER(?), '%');
 
 -- search actors or crew by name
@@ -77,7 +77,7 @@ SELECT
 FROM watches w
 JOIN user_follows uf ON uf.follow_user_id = w.user_id
 JOIN users u ON u.id = w.user_id
-JOIN movies m ON m.id = w.movie_id
+JOIN movie m ON m.id = w.movie_id
 WHERE uf.user_id = ?
 ORDER BY w.created_at DESC
 LIMIT 20;
@@ -92,7 +92,7 @@ VALUES (?, ?, ?, ?, NOW(), NOW());
 
 -- add a movie to a user 
 
-INSERT IGNORE INTO movie_lists_movies (
+INSERT IGNORE INTO movie_lists_movie (
     movie_list_id, movie_id, created_at
 )
 VALUES (?, ?, NOW());
@@ -106,8 +106,8 @@ SELECT
     m.bio,
     mlm.created_at AS added_at
 FROM movie_lists ml
-JOIN movie_lists_movies mlm ON ml.id = mlm.movie_list_id
-JOIN movies m ON m.id = mlm.movie_id
+JOIN movie_lists_movie mlm ON ml.id = mlm.movie_list_id
+JOIN movie m ON m.id = mlm.movie_id
 WHERE ml.user_id = ?
   AND ml.is_watch_list = 1
 ORDER BY mlm.created_at DESC;
@@ -127,8 +127,8 @@ SELECT
     COUNT(w.id) AS total_watches,
     SUM(CASE WHEN w.liked = 1 THEN 1 ELSE 0 END) AS total_likes,
     COUNT(DISTINCT mlm.movie_list_id) AS list_count
-FROM movies m
+FROM movie m
 LEFT JOIN watches w ON w.movie_id = m.id
-LEFT JOIN movie_lists_movies mlm ON mlm.movie_id = m.id
+LEFT JOIN movie_lists_movie mlm ON mlm.movie_id = m.id
 WHERE m.id = ?
 GROUP BY m.id, m.name;
