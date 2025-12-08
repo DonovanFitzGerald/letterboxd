@@ -138,11 +138,11 @@ SELECT
     COUNT(DISTINCT ml.id)          AS total_lists
 FROM users u
 LEFT JOIN watches w
-       ON w.user_id = u.id
+        ON w.user_id = u.id
 LEFT JOIN watch_comments wc
-       ON wc.user_id = u.id
+        ON wc.user_id = u.id
 LEFT JOIN movie_lists ml
-       ON ml.user_id = u.id
+        ON ml.user_id = u.id
 GROUP BY u.id, u.name, u.created_at;
 
 -- Movies with basic metadata
