@@ -37,6 +37,101 @@ CREATE INDEX idx_movie_lists_movies_list_created_at
 CREATE INDEX idx_watches_movie_rating
     ON watches (movie_id, rating);
 
--- Speed up lookups of list membership per movie
+-- Speed up lookups for number of lists made that contain a movie
 CREATE INDEX idx_movie_lists_movies_movie
     ON movie_lists_movies (movie_id);
+
+
+-----------------------------------------------------------
+-- MARK: Views
+-----------------------------------------------------------
+
+-- Aggregated user data
+CREATE VIEW v_user_profile_summary AS
+SELECT 
+    u.id,
+    u.name,
+    u.email,
+    u.profile_image,
+    u.created_at,
+    COUNT(DISTINCT f1.id) AS following_count,
+    COUNT(DISTINCT f2.id) AS follower_count
+FROM users u
+LEFT JOIN user_follows f1 ON f1.user_id = u.id
+LEFT JOIN user_follows f2 ON f2.follow_user_id = u.id
+GROUP BY u.id, u.name, u.email, u.profile_image, u.created_at;
+
+-- Movie rating and popularity stats
+CREATE VIEW v_movie_stats AS
+SELECT
+    m.id                  AS movie_id,
+    m.name                AS movie_name,
+    AVG(w.rating)         AS average_rating,
+    COUNT(w.id)           AS total_watches,
+    SUM(CASE WHEN w.liked = 1 THEN 1 ELSE 0 END) AS total_likes,
+    COUNT(DISTINCT mlm.movie_list_id)            AS list_count
+FROM movies m
+LEFT JOIN watches w
+        ON w.movie_id = m.id AND w.rating IS NOT NULL
+LEFT JOIN movie_lists_movies mlm
+        ON mlm.movie_id = m.id
+GROUP BY m.id, m.name;
+
+-- User watchlist with movie details
+CREATE VIEW v_user_watchlist AS
+SELECT 
+    ml.user_id,
+    m.id            AS movie_id,
+    m.name          AS movie_name,
+    m.release_date,
+    m.bio,
+    mlm.created_at  AS added_at
+FROM movie_lists ml
+JOIN movie_lists_movies mlm ON ml.id = mlm.movie_list_id
+JOIN movies m               ON m.id = mlm.movie_id
+WHERE ml.is_watch_list = 1;
+
+-- Watches joined with users
+CREATE VIEW v_watches_with_user_movie AS
+SELECT 
+    w.id           AS watch_id,
+    w.user_id,
+    u.name         AS user_name,
+    w.movie_id,
+    m.name         AS movie_name,
+    w.rating,
+    w.liked,
+    w.review_text,
+    w.created_at
+FROM watches w
+JOIN users  u ON u.id = w.user_id
+JOIN movies m ON m.id = w.movie_id;
+
+-- User engagement summary
+CREATE VIEW v_user_engagement AS
+SELECT
+    u.id AS user_id,
+    u.name,
+    u.created_at,
+    COUNT(DISTINCT w.id)           AS total_watches,
+    COUNT(DISTINCT wc.id)          AS total_comments,
+    COUNT(DISTINCT ml.id)          AS total_lists
+FROM users u
+LEFT JOIN watches w
+       ON w.user_id = u.id
+LEFT JOIN watch_comments wc
+       ON wc.user_id = u.id
+LEFT JOIN movie_lists ml
+       ON ml.user_id = u.id
+GROUP BY u.id, u.name, u.created_at;
+
+-- Movies with basic metadata
+CREATE VIEW v_movie_metadata AS
+SELECT
+    m.id          AS movie_id,
+    m.name        AS movie_name,
+    m.release_date,
+    m.bio
+FROM movies m;
+
+
