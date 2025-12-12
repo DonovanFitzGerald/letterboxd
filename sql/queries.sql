@@ -19,8 +19,11 @@ CALL sp_search_people('nolan');
 -- Follow a user
 CALL sp_follow_user(1, 2);
 
--- Get feed
-CALL sp_get_following_activity(1);
+-- Unfollow a user
+CALL sp_unfollow_user(1, 2);
+
+-- Get feed/activity from followed users (user_id, limit, offset)
+CALL sp_get_user_feed(1, 20, 0);
 
 -- Create watchlist
 CALL sp_create_list(1, 'My Watchlist', 1, 0);
@@ -28,11 +31,14 @@ CALL sp_create_list(1, 'My Watchlist', 1, 0);
 -- Add movie to list
 CALL sp_add_movie_to_list(1, 10);
 
--- Get watchlist
+-- Get watchlist with movie details
 CALL sp_get_watchlist(1);
 
--- Average rating
-CALL sp_get_average_rating(10);
+-- Remove movie from watchlist
+CALL sp_remove_from_watchlist(1, 10);
 
--- Movie stats
+-- Movie stats (includes average rating and watch counts by timeframe)
 CALL sp_get_movie_stats(10);
+
+-- Delete user (cascades to all user data)
+-- CALL sp_delete_user(1);
