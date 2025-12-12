@@ -41,4 +41,4 @@ CALL sp_remove_from_watchlist(1, 10);
 CALL sp_get_movie_stats(10);
 
 -- Delete user (cascades to all user data)
--- CALL sp_delete_user(1);
+CALL sp_delete_user(1);
