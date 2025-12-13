@@ -8,7 +8,7 @@ CALL sp_get_user_profile(1);
 CALL sp_update_user_profile(1, 'Alice Updated', NULL);
 
 -- Log a watch
-CALL sp_log_watch(1, 10, 1, 0, 5, 'Amazing movie');
+CALL sp_log_watch(1, 11, 1, 0, 5, 'Amazing movie');
 
 -- Search movies
 CALL sp_search_movies('matrix');
