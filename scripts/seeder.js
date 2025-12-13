@@ -3,22 +3,22 @@ const fs = require("fs");
 const path = require("path");
 
 const CONFIG = {
-	users: 50,
-	userFollows: 100,
-	languages: 10,
-	countries: 20,
-	studios: 25,
-	movieLanguages: 200,
-	movieStudios: 200,
-	events: 20,
-	releases: 100,
-	movieReleases: 150,
-	tags: 30,
-	movieLists: 100,
-	movieListsmovie: 300,
-	movieListsTags: 150,
-	watches: 500,
-	watchComments: 200,
+	users: 500,
+	userFollows: 1000,
+	languages: 100,
+	countries: 200,
+	studios: 250,
+	movieLanguages: 2000,
+	movieStudios: 2000,
+	events: 200,
+	releases: 1000,
+	movieReleases: 1500,
+	tags: 300,
+	movieLists: 1000,
+	movieListsmovie: 3000,
+	movieListsTags: 1500,
+	watches: 5000,
+	watchComments: 2000,
 };
 
 const OUTPUT_FILE = path.join(__dirname, "..", "sql", "data.sql");

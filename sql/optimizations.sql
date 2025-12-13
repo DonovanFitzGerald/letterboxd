@@ -10,7 +10,7 @@ ALTER TABLE movie_lists_movie DROP INDEX IF EXISTS idx_movie_lists_movie_list_mo
 ALTER TABLE movie_lists_movie DROP INDEX IF EXISTS idx_movie_lists_movie_list_created_at;
 ALTER TABLE movie_lists_movie DROP INDEX IF EXISTS idx_movie_lists_movie_movie;
 ALTER TABLE movie DROP INDEX IF EXISTS ft_movie_title;
-ALTER TABLE people DROP INDEX IF EXISTS ft_people_name;
+ALTER TABLE person DROP INDEX IF EXISTS ft_person_name;
 ALTER TABLE watches DROP INDEX IF EXISTS idx_watches_user_created_at;
 ALTER TABLE watches DROP INDEX IF EXISTS idx_watches_movie_rating;
 
@@ -33,9 +33,9 @@ CREATE INDEX idx_movie_lists_movie_list_movie
 CREATE FULLTEXT INDEX ft_movie_title
     ON movie (title);
 
--- Text search on people names
-CREATE FULLTEXT INDEX ft_people_name
-    ON people (name);
+-- Text search on person names
+CREATE FULLTEXT INDEX ft_person_name
+    ON person (name);
 
 -- Get watches for a user ordered by recency
 CREATE INDEX idx_watches_user_created_at

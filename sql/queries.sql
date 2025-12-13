@@ -13,8 +13,8 @@ CALL sp_log_watch(1, 10, 1, 0, 5, 'Amazing movie');
 -- Search movies
 CALL sp_search_movies('matrix');
 
--- Search people
-CALL sp_search_people('nolan');
+-- Search person
+CALL sp_search_person('nolan');
 
 -- Follow a user
 CALL sp_follow_user(1, 2);
@@ -40,5 +40,5 @@ CALL sp_remove_from_watchlist(1, 10);
 -- Movie stats (includes average rating and watch counts by timeframe)
 CALL sp_get_movie_stats(10);
 
--- Delete user (cascades to all user data)
+-- Delete user
 CALL sp_delete_user(1);

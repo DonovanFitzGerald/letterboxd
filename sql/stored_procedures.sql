@@ -12,7 +12,7 @@ DROP PROCEDURE IF EXISTS sp_get_user_profile;
 DROP PROCEDURE IF EXISTS sp_update_user_profile;
 DROP PROCEDURE IF EXISTS sp_log_watch;
 DROP PROCEDURE IF EXISTS sp_search_movies;
-DROP PROCEDURE IF EXISTS sp_search_people;
+DROP PROCEDURE IF EXISTS sp_search_person;
 DROP PROCEDURE IF EXISTS sp_follow_user;
 DROP PROCEDURE IF EXISTS sp_unfollow_user;
 DROP PROCEDURE IF EXISTS sp_create_list;
@@ -125,13 +125,13 @@ BEGIN
 END $$
 
 
--- search people by name
-CREATE PROCEDURE sp_search_people (
+-- search person by name
+CREATE PROCEDURE sp_search_person (
     IN p_query VARCHAR(100)
 )
 BEGIN
     SELECT DISTINCT p.id, p.name, p.bio
-    FROM people p
+    FROM person p
     WHERE LOWER(p.name) LIKE CONCAT('%', LOWER(p_query), '%');
 END $$
 

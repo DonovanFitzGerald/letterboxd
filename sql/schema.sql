@@ -115,16 +115,6 @@ CREATE TABLE movie_lists_tags (
   UNIQUE (movie_list_id, tag_id)
 );
 
-
-CREATE TABLE people (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name CHAR(50) NOT NULL,
-  bio TEXT NOT NULL,
-  created_at DATETIME NOT NULL,
-  updated_at DATETIME NOT NULL
-);
-
-
 CREATE TABLE languages (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name CHAR(50) NOT NULL,
