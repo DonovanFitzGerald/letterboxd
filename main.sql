@@ -21564,7 +21564,7 @@ CREATE PROCEDURE sp_search_person (
     IN p_query VARCHAR(100)
 )
 BEGIN
-    SELECT DISTINCT p.id, p.name, p.bio
+    SELECT DISTINCT p.*
     FROM person p
     WHERE LOWER(p.name) LIKE CONCAT('%', LOWER(p_query), '%');
 END $$

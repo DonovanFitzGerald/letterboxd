@@ -22,23 +22,23 @@ CALL sp_follow_user(1, 2);
 -- Unfollow a user
 CALL sp_unfollow_user(1, 2);
 
--- Get feed/activity from followed users (user_id, limit, offset)
+-- Get feed/activity from followed users
 CALL sp_get_user_feed(1, 20, 0);
 
 -- Create watchlist
 CALL sp_create_list(1, 'My Watchlist', 1, 0);
 
 -- Add movie to list
-CALL sp_add_movie_to_list(1, 10);
+CALL sp_add_movie_to_list(1, 11);
 
 -- Get watchlist with movie details
-CALL sp_get_watchlist(1);
+CALL sp_get_watchlist(236);
 
 -- Remove movie from watchlist
-CALL sp_remove_from_watchlist(1, 10);
+CALL sp_remove_from_watchlist(236, 11);
 
 -- Movie stats (includes average rating and watch counts by timeframe)
-CALL sp_get_movie_stats(10);
+CALL sp_get_movie_stats(11);
 
 -- Delete user
 CALL sp_delete_user(1);
